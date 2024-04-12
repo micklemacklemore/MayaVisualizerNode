@@ -1,4 +1,4 @@
-#include "footPrint.h"
+#include "VisualizerNode.h"
 
 #include <maya/MDistance.h>
 #include <maya/MViewport2Renderer.h>
@@ -6,16 +6,16 @@
 
 #include <cassert>
 
-MObject footPrint::size;
-MTypeId footPrint::id( 0x80007 );
-MString	footPrint::drawDbClassification("drawdb/geometry/footPrint");
-MString	footPrint::drawRegistrantId("FootprintNodePlugin");
-MObject footPrint::worldS;
+MObject VisualizerNode::size;
+MTypeId VisualizerNode::id( 0x80007 );
+MString	VisualizerNode::drawDbClassification("drawdb/geometry/visualizerNode");
+MString	VisualizerNode::drawRegistrantId("VisualizerNodePlugin");
+MObject VisualizerNode::worldS;
 
-footPrint::footPrint() {}
-footPrint::~footPrint() {}
+VisualizerNode::VisualizerNode() {}
+VisualizerNode::~VisualizerNode() {}
 
-MStatus footPrint::compute( const MPlug& plug/*plug*/, MDataBlock& dataBlock/*data*/ )
+MStatus VisualizerNode::compute( const MPlug& plug/*plug*/, MDataBlock& dataBlock/*data*/ )
 {
     MStatus s;
     if (plug == worldS) 
@@ -34,12 +34,12 @@ MStatus footPrint::compute( const MPlug& plug/*plug*/, MDataBlock& dataBlock/*da
     return MS::kUnknownParameter;;
 }
 
-bool footPrint::isBounded() const
+bool VisualizerNode::isBounded() const
 {
     return true;
 }
 
-MBoundingBox footPrint::boundingBox() const
+MBoundingBox VisualizerNode::boundingBox() const
 {
     // Get the size
     //
@@ -60,7 +60,7 @@ MBoundingBox footPrint::boundingBox() const
 }
 
 // Called before this node is evaluated by Evaluation Manager
-MStatus footPrint::preEvaluation(
+MStatus VisualizerNode::preEvaluation(
     const MDGContext& context,
     const MEvaluationNode& evaluationNode)
 {
@@ -76,14 +76,14 @@ MStatus footPrint::preEvaluation(
     return MStatus::kSuccess;
 }
 
-void footPrint::getCacheSetup(const MEvaluationNode& evalNode, MNodeCacheDisablingInfo& disablingInfo, MNodeCacheSetupInfo& cacheSetupInfo, MObjectArray& monitoredAttributes) const
+void VisualizerNode::getCacheSetup(const MEvaluationNode& evalNode, MNodeCacheDisablingInfo& disablingInfo, MNodeCacheSetupInfo& cacheSetupInfo, MObjectArray& monitoredAttributes) const
 {
     MPxLocatorNode::getCacheSetup(evalNode, disablingInfo, cacheSetupInfo, monitoredAttributes);
     assert(!disablingInfo.getCacheDisabled());
     cacheSetupInfo.setPreference(MNodeCacheSetupInfo::kWantToCacheByDefault, true);
 }
 
-void* footPrint::creator()
+void* VisualizerNode::creator()
 {
-    return new footPrint();
+    return new VisualizerNode();
 }

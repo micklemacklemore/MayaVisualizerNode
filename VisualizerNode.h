@@ -8,11 +8,11 @@
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
-class footPrint : public MPxLocatorNode
+class VisualizerNode : public MPxLocatorNode
 {
 public:
-    footPrint();
-    ~footPrint() override;
+    VisualizerNode();
+    ~VisualizerNode() override;
 
     MStatus   		compute( const MPlug& plug, MDataBlock& data ) override;
 

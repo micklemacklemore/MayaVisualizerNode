@@ -4,14 +4,14 @@
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
-#include "FootPrint.h"
-#include "FootPrintDrawOverride.h"
+#include "VisualizerNode.h"
+#include "VisualizerNodeDrawOverride.h"
 
 #include <maya/MFnPlugin.h>
 #include <maya/MFnUnitAttribute.h>
 #include <maya/MDrawRegistry.h>
 
-MStatus footPrint::initialize()
+MStatus VisualizerNode::initialize()
 {
     MFnUnitAttribute unitFn;
     MStatus			 stat;
@@ -44,21 +44,21 @@ MStatus initializePlugin( MObject obj )
     MFnPlugin plugin( obj, PLUGIN_COMPANY, "3.0", "Any");
 
     status = plugin.registerNode(
-                "footPrint",
-                footPrint::id,
-                &footPrint::creator,
-                &footPrint::initialize,
+                "visualizerNode",
+                VisualizerNode::id,
+                &VisualizerNode::creator,
+                &VisualizerNode::initialize,
                 MPxNode::kLocatorNode,
-                &footPrint::drawDbClassification);
+                &VisualizerNode::drawDbClassification);
     if (!status) {
         status.perror("registerNode");
         return status;
     }
 
     status = MHWRender::MDrawRegistry::registerDrawOverrideCreator(
-        footPrint::drawDbClassification,
-        footPrint::drawRegistrantId,
-        FootPrintDrawOverride::Creator);
+        VisualizerNode::drawDbClassification,
+        VisualizerNode::drawRegistrantId,
+        VisualizerNodeDrawOverride::Creator);
     if (!status) {
         status.perror("registerDrawOverrideCreator");
         return status;
@@ -73,15 +73,15 @@ MStatus uninitializePlugin( MObject obj)
     MFnPlugin plugin( obj );
 
     status = MHWRender::MDrawRegistry::deregisterDrawOverrideCreator(
-        footPrint::drawDbClassification,
-        footPrint::drawRegistrantId);
+        VisualizerNode::drawDbClassification,
+        VisualizerNode::drawRegistrantId);
 
     if (!status) {
         status.perror("deregisterDrawOverrideCreator");
             return status;
     }
 
-    status = plugin.deregisterNode( footPrint::id );
+    status = plugin.deregisterNode( VisualizerNode::id );
     if (!status) {
         status.perror("deregisterNode");
         return status;

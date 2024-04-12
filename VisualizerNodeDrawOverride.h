@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FootPrint.h"
+#include "VisualizerNode.h"
 
 #include <maya/MGlobal.h>
 #include <maya/MUserData.h>
@@ -67,15 +67,15 @@ public:
     MPointArray  fTriangleList;
 };
 
-class FootPrintDrawOverride : public MHWRender::MPxDrawOverride
+class VisualizerNodeDrawOverride : public MHWRender::MPxDrawOverride
 {
 public:
     static MHWRender::MPxDrawOverride* Creator(const MObject& obj)
     {
-        return new FootPrintDrawOverride(obj);
+        return new VisualizerNodeDrawOverride(obj);
     }
 
-    ~FootPrintDrawOverride() override;
+    ~VisualizerNodeDrawOverride() override;
 
     MHWRender::DrawAPI supportedDrawAPIs() const override;
 
@@ -108,21 +108,21 @@ public:
     }
     void handleTraceMessage( const MString &message ) const override
     {
-        MGlobal::displayInfo("footPrintDrawOverride: " + message);
+        MGlobal::displayInfo("VisualizerNodeDrawOverride: " + message);
 
         // Some simple custom message formatting.
-        fputs("footPrintDrawOverride: ",stderr);
+        fputs("VisualizerNodeDrawOverride: ",stderr);
         fputs(message.asChar(),stderr);
         fputs("\n",stderr);
     }
 
 
 private:
-    FootPrintDrawOverride(const MObject& obj);
+    VisualizerNodeDrawOverride(const MObject& obj);
     float getMultiplier(const MDagPath& objPath) const;
 
     static void OnModelEditorChanged(void *clientData);
 
-    footPrint*  fFootPrint;
+    VisualizerNode*  fVisualizerNode;
     MCallbackId fModelEditorChangedCbId;
 };

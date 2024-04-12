@@ -1,27 +1,4 @@
-//-
-// ==========================================================================
-// Copyright 2015 Autodesk, Inc.  All rights reserved.
-// Use of this software is subject to the terms of the Autodesk license agreement
-// provided at the time of installation or download, or which otherwise
-// accompanies this software in either electronic or hard copy form.
-// ==========================================================================
-//+
-
-////////////////////////////////////////////////////////////////////////
-// DESCRIPTION: 
-//
-// 
-// This plug-in demonstrates how to draw a simple mesh like foot Print in an easy way.
-//
-// This easy way is supported in Viewport 2.0.
-// In Viewport 2.0, MUIDrawManager can used to draw simple UI elements in method addUIDrawables().
-//
-// For comparison, you can reference a Maya Developer Kit sample named rawfootPrintNode.
-// In that sample, we draw the footPrint with OpenGL\DX in method rawFootPrintDrawOverride::draw().
-//
-////////////////////////////////////////////////////////////////////////
-
-#include "FootPrintDrawOverride.h"
+#include "VisualizerNodeDrawOverride.h"
 
 #include <maya/MDistance.h>
 #include <maya/MFnUnitAttribute.h>
@@ -47,7 +24,7 @@
 // MRenderer::setGeometryDrawDirty()) for certain circumstances. Note that
 // the draw callback in MPxDrawOverride constructor is set to NULL in order
 // to achieve better performance.
-FootPrintDrawOverride::FootPrintDrawOverride(const MObject& obj)
+VisualizerNodeDrawOverride::VisualizerNodeDrawOverride(const MObject& obj)
 : MHWRender::MPxDrawOverride(obj, NULL, false)
 {
     fModelEditorChangedCbId = MEventMessage::addEventCallback(
@@ -55,12 +32,12 @@ FootPrintDrawOverride::FootPrintDrawOverride(const MObject& obj)
 
     MStatus status;
     MFnDependencyNode node(obj, &status);
-    fFootPrint = status ? dynamic_cast<footPrint*>(node.userNode()) : NULL;
+    fVisualizerNode = status ? dynamic_cast<VisualizerNode*>(node.userNode()) : NULL;
 }
 
-FootPrintDrawOverride::~FootPrintDrawOverride()
+VisualizerNodeDrawOverride::~VisualizerNodeDrawOverride()
 {
-    fFootPrint = NULL;
+    fVisualizerNode = NULL;
 
     if (fModelEditorChangedCbId != 0)
     {
@@ -69,31 +46,31 @@ FootPrintDrawOverride::~FootPrintDrawOverride()
     }
 }
 
-void FootPrintDrawOverride::OnModelEditorChanged(void *clientData)
+void VisualizerNodeDrawOverride::OnModelEditorChanged(void *clientData)
 {
     // Mark the node as being dirty so that it can update on display appearance
     // switch among wireframe and shaded.
-    FootPrintDrawOverride *ovr = static_cast<FootPrintDrawOverride*>(clientData);
-    if (ovr && ovr->fFootPrint)
+    VisualizerNodeDrawOverride *ovr = static_cast<VisualizerNodeDrawOverride*>(clientData);
+    if (ovr && ovr->fVisualizerNode)
     {
-        MHWRender::MRenderer::setGeometryDrawDirty(ovr->fFootPrint->thisMObject());
+        MHWRender::MRenderer::setGeometryDrawDirty(ovr->fVisualizerNode->thisMObject());
     }
 }
 
-MHWRender::DrawAPI FootPrintDrawOverride::supportedDrawAPIs() const
+MHWRender::DrawAPI VisualizerNodeDrawOverride::supportedDrawAPIs() const
 {
     // this plugin supports both GL and DX
     return (MHWRender::kOpenGL | MHWRender::kDirectX11 | MHWRender::kOpenGLCoreProfile);
 }
 
-float FootPrintDrawOverride::getMultiplier(const MDagPath& objPath) const
+float VisualizerNodeDrawOverride::getMultiplier(const MDagPath& objPath) const
 {
     // Retrieve value of the size attribute from the node
     MStatus status;
-    MObject footprintNode = objPath.node(&status);
+    MObject visNode = objPath.node(&status);
     if (status)
     {
-        MPlug plug(footprintNode, footPrint::size);
+        MPlug plug(visNode, VisualizerNode::size);
         if (!plug.isNull())
         {
             MDistance sizeVal;
@@ -107,13 +84,13 @@ float FootPrintDrawOverride::getMultiplier(const MDagPath& objPath) const
     return 1.0f;
 }
 
-bool FootPrintDrawOverride::isBounded(const MDagPath& /*objPath*/,
+bool VisualizerNodeDrawOverride::isBounded(const MDagPath& /*objPath*/,
                                       const MDagPath& /*cameraPath*/) const
 {
     return true;
 }
 
-MBoundingBox FootPrintDrawOverride::boundingBox(
+MBoundingBox VisualizerNodeDrawOverride::boundingBox(
     const MDagPath& objPath,
     const MDagPath& cameraPath) const
 {
@@ -128,7 +105,7 @@ MBoundingBox FootPrintDrawOverride::boundingBox(
 }
 
 // Called by Maya each time the object needs to be drawn.
-MUserData* FootPrintDrawOverride::prepareForDraw(
+MUserData* VisualizerNodeDrawOverride::prepareForDraw(
     const MDagPath& objPath,
     const MDagPath& cameraPath,
     const MHWRender::MFrameContext& frameContext,
@@ -198,7 +175,7 @@ MUserData* FootPrintDrawOverride::prepareForDraw(
 // addUIDrawables() provides access to the MUIDrawManager, which can be used
 // to queue up operations for drawing simple UI elements such as lines, circles and
 // text. To enable addUIDrawables(), override hasUIDrawables() and make it return true.
-void FootPrintDrawOverride::addUIDrawables(
+void VisualizerNodeDrawOverride::addUIDrawables(
         const MDagPath& objPath,
         MHWRender::MUIDrawManager& drawManager,
         const MHWRender::MFrameContext& frameContext,
@@ -232,7 +209,7 @@ void FootPrintDrawOverride::addUIDrawables(
 
     drawManager.setColor( textColor );
     drawManager.setFontSize( MHWRender::MUIDrawManager::kSmallFontSize );
-    drawManager.text( pos,  MString("Footprint"), MHWRender::MUIDrawManager::kCenter );
+    drawManager.text( pos,  MString("Incredible Stuff!! Truly!!!! Wow."), MHWRender::MUIDrawManager::kCenter );
     drawManager.endDrawable();
 }
 

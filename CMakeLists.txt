@@ -17,13 +17,12 @@ cmake_minimum_required(VERSION 2.8)
 include($ENV{DEVKIT_LOCATION}/cmake/pluginEntry.cmake)
 
 # specify project name
-set(PROJECT_NAME footPrintNode)
+set(PROJECT_NAME VisualizerNode)
 
 # set SOURCE_FILES
 set(SOURCE_FILES
-   FootPrintNode.cpp
-   FootPrint.h FootPrint.cpp
-   FootPrintDrawOverride.h FootPrintDrawOverride.cpp
+   VisualizerNode.h VisualizerNode.cpp
+   VisualizerNodeDrawOverride.h VisualizerNodeDrawOverride.cpp
    pluginEntry.cpp
 )
 
