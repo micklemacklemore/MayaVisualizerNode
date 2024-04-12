@@ -4,6 +4,8 @@
 #include <maya/MViewport2Renderer.h>
 #include <maya/MEvaluationNode.h>
 
+#include <maya/MFnUnitAttribute.h>
+
 #include <cassert>
 
 MObject VisualizerNode::size;
@@ -86,4 +88,31 @@ void VisualizerNode::getCacheSetup(const MEvaluationNode& evalNode, MNodeCacheDi
 void* VisualizerNode::creator()
 {
     return new VisualizerNode();
+}
+
+MStatus VisualizerNode::initialize()
+{
+    MFnUnitAttribute unitFn;
+    MStatus			 stat;
+
+    size = unitFn.create( "size", "sz", MFnUnitAttribute::kDistance );
+    unitFn.setDefault( 1.0 );
+
+    stat = addAttribute( size );
+    if (!stat) {
+        stat.perror("addAttribute");
+        return stat;
+    }
+
+    worldS = unitFn.create("worldS", "ws", MFnUnitAttribute::kDistance, 1.0);
+    unitFn.setWritable(true);
+    unitFn.setCached(false);
+    unitFn.setArray( true );
+    unitFn.setUsesArrayDataBuilder( true );
+    unitFn.setWorldSpace( true );
+
+    addAttribute( worldS );
+    attributeAffects(size, worldS);
+
+    return MS::kSuccess;
 }
