@@ -26,10 +26,12 @@ MStatus VisualizeCmd::doIt( const MArgList & ) {
     MPlug lineDataPlug = mfnNode.findPlug("lineData", true, &status); 
     CHECK_MSTATUS_AND_RETURN_IT(status); 
 
-    // debug, initially there wont be an MPointArray assigned to it. 
+    // debug, this will print to kInvalid since there's no data yet (? idk why it's like this)
     MGlobal::displayInfo(lineDataPlug.asMObject().apiTypeStr()); 
 
     MPointArray points; 
+
+    // draw some cool ass points
     points.append(MPoint(0., 0.));
     points.append(MPoint(1., 0.));
 
