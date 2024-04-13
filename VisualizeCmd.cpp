@@ -1,5 +1,4 @@
 #include "VisualizeCmd.h"
-#include "VisualizerDrawDataNode.h"
 #include "VisualizerNode.h"
 
 #include <maya/MIOStream.h>
@@ -7,6 +6,7 @@
 #include <maya/MFnPointArrayData.h>
 #include <maya/MPointArray.h>
 #include <maya/MGlobal.h>
+#include <maya/MViewport2Renderer.h>
 
 MStatus VisualizeCmd::doIt( const MArgList & ) {
 
@@ -16,26 +16,12 @@ MStatus VisualizeCmd::doIt( const MArgList & ) {
     MFnDagNode mfnNode;
     MObject transformNode = mfnNode.create(VisualizerNode::id, MObject::kNullObj, &status); 
     CHECK_MSTATUS_AND_RETURN_IT(status);
-
-    // Get the first child of the transform node, which is the actual shape node
-    MObject shapeNode;
-    unsigned int numChildren = mfnNode.childCount(&status);
+    
+    // find the visualizer node because mfnDagNode create returns the 
+    // parent transform (for some STUPID reason)
+    MObject child = mfnNode.child(0, &status);
     CHECK_MSTATUS_AND_RETURN_IT(status);
-    for (unsigned int i = 0; i < numChildren; i++) {
-        MObject child = mfnNode.child(i, &status);
-        CHECK_MSTATUS_AND_RETURN_IT(status);
-        if (child.hasFn(MFn::kPluginLocatorNode) || child.hasFn(MFn::kLocator)) {
-            shapeNode = child;
-            break;
-        }
-    }
-
-    if (shapeNode.isNull()) {
-        MGlobal::displayError("Visualizer node not found under transform");
-        return MStatus::kFailure; 
-    }
-
-    mfnNode.setObject(shapeNode); 
+    mfnNode.setObject(child); 
 
     MPlug lineDataPlug = mfnNode.findPlug("lineData", true, &status); 
     CHECK_MSTATUS_AND_RETURN_IT(status); 
@@ -44,7 +30,17 @@ MStatus VisualizeCmd::doIt( const MArgList & ) {
     MGlobal::displayInfo(lineDataPlug.asMObject().apiTypeStr()); 
 
     MPointArray points; 
-    points.append(MPoint(1., 2., 3., 4.));
+    points.append(MPoint(0., 0.));
+    points.append(MPoint(1., 0.));
+
+    points.append(MPoint(1., 0.));
+    points.append(MPoint(1., 1.));
+
+    points.append(MPoint(1., 1.));
+    points.append(MPoint(0., 1.));
+
+    points.append(MPoint(0., 1.));
+    points.append(MPoint(0., 0.));
 
     MFnPointArrayData fnPointArrayData;
     MObject paData = fnPointArrayData.create(points, &status);
@@ -64,6 +60,9 @@ MStatus VisualizeCmd::doIt( const MArgList & ) {
         }
 
         MGlobal::displayInfo(test.apiTypeStr()); 
+
+        // I'm not sure if I actually need to call this..
+        //MHWRender::MRenderer::setGeometryDrawDirty(child); 
     }
 
 

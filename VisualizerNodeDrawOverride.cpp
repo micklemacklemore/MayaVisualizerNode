@@ -13,6 +13,7 @@
 #include <maya/MGlobal.h>
 #include <maya/MEventMessage.h>
 #include <maya/MFnDependencyNode.h>
+#include <maya/MFnPointArrayData.h>
 
 #include <assert.h>
 
@@ -25,7 +26,7 @@
 // the draw callback in MPxDrawOverride constructor is set to NULL in order
 // to achieve better performance.
 VisualizerNodeDrawOverride::VisualizerNodeDrawOverride(const MObject& obj)
-: MHWRender::MPxDrawOverride(obj, NULL, false)
+: MHWRender::MPxDrawOverride(obj, NULL, true)
 {
     fModelEditorChangedCbId = MEventMessage::addEventCallback(
         "modelEditorChanged", OnModelEditorChanged, this);
@@ -126,6 +127,28 @@ MUserData* VisualizerNodeDrawOverride::prepareForDraw(
 
     data->fLineList.clear();
 
+    MStatus status; 
+    MFnDependencyNode fNode; 
+    fNode.setObject(objPath.node());
+
+    MPlug lineDataPlug = fNode.findPlug("lineData", true, &status);
+
+    if (status) {
+        MObject lineDataObj = lineDataPlug.asMObject(); 
+        if (lineDataObj.hasFn(MFn::Type::kPointArrayData)) {
+            MFnPointArrayData fPointArrayData; 
+            fPointArrayData.setObject(lineDataObj); 
+            MPointArray lineList = fPointArrayData.array();
+
+
+            for (int i = 0; i < lineList.length(); i += 2) {
+                data->fLineList.append(lineList[i] * fMultiplier);
+                data->fLineList.append(lineList[i + 1] * fMultiplier);
+            }
+        }
+    }
+
+#if 0
     for (int i = 0; i <= soleCount - 2; i++)
     {
         data->fLineList.append(sole[i][0] * fMultiplier, sole[i][1] * fMultiplier, sole[i][2] * fMultiplier);
@@ -137,22 +160,11 @@ MUserData* VisualizerNodeDrawOverride::prepareForDraw(
         data->fLineList.append(heel[i][0] * fMultiplier, heel[i][1] * fMultiplier, heel[i][2] * fMultiplier);
         data->fLineList.append(heel[i+1][0] * fMultiplier, heel[i+1][1] * fMultiplier, heel[i+1][2] * fMultiplier);
     }
+#endif
 
     data->fTriangleList.clear();
 
-    for (int i = 1; i <= soleCount - 2; i++)
-    {
-        data->fTriangleList.append(sole[0][0] * fMultiplier, sole[0][1] * fMultiplier, sole[0][2] * fMultiplier);
-        data->fTriangleList.append(sole[i][0] * fMultiplier, sole[i][1] * fMultiplier, sole[i][2] * fMultiplier);
-        data->fTriangleList.append(sole[i+1][0] * fMultiplier, sole[i+1][1] * fMultiplier, sole[i+1][2] * fMultiplier);
-    }
-
-    for (int i = 1; i <= heelCount - 2; i++)
-    {
-        data->fTriangleList.append(heel[0][0] * fMultiplier, heel[0][1] * fMultiplier, heel[0][2] * fMultiplier);
-        data->fTriangleList.append(heel[i][0] * fMultiplier, heel[i][1] * fMultiplier, heel[i][2] * fMultiplier);
-        data->fTriangleList.append(heel[i+1][0] * fMultiplier, heel[i+1][1] * fMultiplier, heel[i+1][2] * fMultiplier);
-    }
+    
 
     // get correct color and depth priority based on the state of object, e.g. active or dormant
     //data->fColor = MHWRender::MGeometryUtilities::wireframeColor(objPath);
@@ -195,9 +207,9 @@ void VisualizerNodeDrawOverride::addUIDrawables(
     drawManager.setColor( MColor{1.f, 0.f, 0.f, 1.f} );
     drawManager.setDepthPriority( pLocatorData->fDepthPriority );
 
-    if (frameContext.getDisplayStyle() & MHWRender::MFrameContext::kGouraudShaded) {
-        drawManager.mesh(MHWRender::MUIDrawManager::kTriangles, pLocatorData->fTriangleList);
-    }
+    //if (frameContext.getDisplayStyle() & MHWRender::MFrameContext::kGouraudShaded) {
+    //    drawManager.mesh(MHWRender::MUIDrawManager::kTriangles, pLocatorData->fTriangleList);
+    //}
 
     drawManager.setColor( MColor{0.f, 1.f, 0.f, 1.f} );
 
