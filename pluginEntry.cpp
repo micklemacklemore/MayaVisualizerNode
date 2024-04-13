@@ -7,9 +7,11 @@
 #include "VisualizerNode.h"
 #include "VisualizerNodeDrawOverride.h"
 #include "VisualizerDrawDataNode.h"
+#include "VisualizeCmd.h"
 
 #include <maya/MFnPlugin.h>
 #include <maya/MDrawRegistry.h>
+
 
 MStatus initializePlugin( MObject obj )
 {
@@ -47,6 +49,13 @@ MStatus initializePlugin( MObject obj )
         return status;
     }
 
+    // register the test command
+    status = plugin.registerCommand( "visualizeCmd", VisualizeCmd::creator );
+    if (!status) {
+        status.perror("register command");
+        return status; 
+    }
+
     return status;
 }
 
@@ -75,5 +84,13 @@ MStatus uninitializePlugin( MObject obj)
         status.perror("deregisterNode");
         return status;
     }
+
+    status = plugin.deregisterCommand("visualizeCmd"); 
+
+    if (!status) {
+        status.perror("deregister command");
+        return status;
+    }
+
     return status;
 }

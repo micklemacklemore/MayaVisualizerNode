@@ -18,6 +18,10 @@ public:
     //static  MObject     cOutput;    // The cosinusoidal output value.
     //static  MObject     frames;     // Number of frames for one circle.
     //static  MObject     scale;      // Size of circle.
-    static  MObject     drawData;     // array attrs data
+    //static  MObject     drawData;     // array attrs data
+    static  MObject     lineArray; 
+    static  MObject     lineColorArray; 
+    static  MObject     triArray; 
+    static  MObject     triColArray; 
     static  MTypeId     id;
 };

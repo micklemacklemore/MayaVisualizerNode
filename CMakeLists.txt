@@ -24,6 +24,7 @@ set(SOURCE_FILES
    VisualizerNode.h VisualizerNode.cpp
    VisualizerNodeDrawOverride.h VisualizerNodeDrawOverride.cpp
    VisualizerDrawDataNode.h VisualizerDrawDataNode.cpp
+   VisualizeCmd.h VisualizeCmd.cpp
    pluginEntry.cpp
 )
 

@@ -49,13 +49,17 @@
 
 #include <math.h>
 
-MTypeId     VisualizerDrawDataNode::id( 0x80005 );
-MObject     VisualizerDrawDataNode::drawData; 
+MTypeId     VisualizerDrawDataNode::id( 0x80006 );
+MObject     VisualizerDrawDataNode::lineArray; 
+MObject     VisualizerDrawDataNode::lineColorArray; 
+MObject     VisualizerDrawDataNode::triArray; 
+MObject     VisualizerDrawDataNode::triColArray; 
 //MObject     VisualizerDrawDataNode::input;        
 //MObject     VisualizerDrawDataNode::sOutput;       
 //MObject     VisualizerDrawDataNode::cOutput;       
 //MObject     VisualizerDrawDataNode::frames;
 //MObject     VisualizerDrawDataNode::scale;
+      
 
 // The creator method creates an instance of the circleNode class
 // and is the first method called by Maya
@@ -123,12 +127,13 @@ MStatus VisualizerDrawDataNode::initialize()
         MFnTypedAttribute mfnType;  
         MStatus status; 
 
-        drawData = mfnType.create("drawData", "dd", MFnData::kDynArrayAttrs, &status);
-        CHECK_MSTATUS(status);
-        CHECK_MSTATUS(mfnType.setWritable(false));
-        CHECK_MSTATUS(mfnType.setStorable(false)); 
+        lineArray = mfnType.create(MString("lineArray"), MString("la"), MFnData::kPointArray, &status); 
+        CHECK_MSTATUS(status); 
+        CHECK_MSTATUS( mfnType.setReadable(true) );
+        CHECK_MSTATUS( mfnType.setWritable(false) );
+        CHECK_MSTATUS( mfnType.setStorable(true) ); 
 
-        CHECK_MSTATUS( addAttribute(drawData) ); 
+        CHECK_MSTATUS( addAttribute(lineArray) );
 
         return MS::kSuccess;
 } 
