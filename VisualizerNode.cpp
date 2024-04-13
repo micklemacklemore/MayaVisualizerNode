@@ -5,6 +5,7 @@
 #include <maya/MEvaluationNode.h>
 
 #include <maya/MFnUnitAttribute.h>
+#include <maya/MFnTypedAttribute.h>
 
 #include <cassert>
 
@@ -13,6 +14,7 @@ MTypeId VisualizerNode::id( 0x80007 );
 MString	VisualizerNode::drawDbClassification("drawdb/geometry/visualizerNode");
 MString	VisualizerNode::drawRegistrantId("VisualizerNodePlugin");
 MObject VisualizerNode::worldS;
+MObject VisualizerNode::lineDrawData; 
 
 VisualizerNode::VisualizerNode() {}
 VisualizerNode::~VisualizerNode() {}
@@ -93,16 +95,13 @@ void* VisualizerNode::creator()
 MStatus VisualizerNode::initialize()
 {
     MFnUnitAttribute unitFn;
+    MFnTypedAttribute mfnType; 
     MStatus			 stat;
 
     size = unitFn.create( "size", "sz", MFnUnitAttribute::kDistance );
     unitFn.setDefault( 1.0 );
 
-    stat = addAttribute( size );
-    if (!stat) {
-        stat.perror("addAttribute");
-        return stat;
-    }
+    
 
     worldS = unitFn.create("worldS", "ws", MFnUnitAttribute::kDistance, 1.0);
     unitFn.setWritable(true);
@@ -111,8 +110,17 @@ MStatus VisualizerNode::initialize()
     unitFn.setUsesArrayDataBuilder( true );
     unitFn.setWorldSpace( true );
 
-    addAttribute( worldS );
-    attributeAffects(size, worldS);
+    lineDrawData = mfnType.create(MString("lineData"), "", MFnData::kPointArray, &stat); 
+    CHECK_MSTATUS(stat); 
+    CHECK_MSTATUS( mfnType.setReadable(true) );
+    CHECK_MSTATUS( mfnType.setWritable(true) );
+    CHECK_MSTATUS( mfnType.setStorable(true) ); 
+
+
+    CHECK_MSTATUS( addAttribute(lineDrawData) );
+    CHECK_MSTATUS( addAttribute( size ) );
+    CHECK_MSTATUS( addAttribute( worldS ));
+    CHECK_MSTATUS( attributeAffects(size, worldS) );
 
     return MS::kSuccess;
 }

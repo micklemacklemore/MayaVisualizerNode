@@ -33,4 +33,5 @@ public:
     static	MString		drawRegistrantId;
 
     static MObject      worldS;
+    static MObject      lineDrawData; 
 };
